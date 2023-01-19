@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled1.pynb - Colaboratory</title>
+    <link rel="shortcut icon" href="gcbicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon-16x16.png" type="image/x-icon">
+    <link rel="stylesheet" href="indexStyle.css">
+    <link rel="stylesheet" href="prism.css">
+    <script src="prism.js"></script>
+</head>
+<body>
+    
+  <div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">SLR</div><code>
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    from google.colab import files
+    .
+    uploaded = files.upload()
+    .
+    df = pd.read_csv('path')
+    .
+    df.head()
+    df.info()
+    print(df.describe())
+    print(df.shape)
+    .
+    X = df['column 1 name']
+    y = df['column 2 name']
+    .
+    plt.scatter(X, y, color = 'blue', label='Scatter Plot')
+    plt.title('Relationship between xlabel andn y label')
+    plt.xlabel('xlabelhere')
+    plt.ylabel('ylabelname')
+    plt.legend(loc=4)
+    plt.show()
+    .
+    print(X.shape)
+    print(y.shape)
+    .
+    X=np.array(X)
+    y=np.array(y)
+    X
+    Y
+    .
+    X = X.reshape(-1,1)
+    y = y.reshape(-1,1)
+    print(X.shape)
+    print(y.shape)
+    .
+    from sklearn.model_selection import train_test_split
+    X_train,X_test,y_train,y_test = train_test_split(X, y, test_size=0.30, random_state=42)
+    print(X_train.shape)
+    print(y_train.shape)
+    print(X_test.shape)
+    print(y_test.shape)
+    .
+    from sklearn.linear_model import LinearRegression
+    lm = LinearRegression()
+    # Training the model
+    lm.fit(X_train,y_train)
+    # Predicting on the test data
+    y_pred=lm.predict(X_test)
+    .
+    plt.scatter(X_train, y_train, color = 'red')
+    plt.plot(X_train, lm.predict(X_train), color = 'blue')
+    plt.scatter(X_test, y_test, color = 'red')
+    plt.plot(X_test, lm.predict(X_test), color = 'blue')
+    plt.title('Test results')
+    plt.xlabel('xlabel name')
+    plt.ylabel('ylabel name')
+    plt.show()
+    .
+    slope = lm.coef_
+    intercept = lm.intercept_,
+    print("Estimated model slope:" , slope)
+    print("Estimated model intercept:" , intercept)
+    .
+    X_new = [[80]]
+    lm.predict(X_new)
+    .
+    from sklearn.metrics import r2_score, mean_squared_error
+    pred_y = lm.predict(X_test)
+    print('R2 Score =',np.abs(r2_score(y_test,pred_y)))
+    print('RMSE = ', np.sqrt(mean_squared_error(y_test,pred_y)))
+  </code></pre></div>
+
+  <!-- <div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">MLR - IPL</div><code>
+    import pandas as pd
+    ipl_df = pd.read_csv("/content/IPL IMB381IPL2013.csv")  
+    print(ipl_df.info())
+    print(ipl_df.shape)
+    print(ipl_df.head())
+    ipl_df.iloc[0:5, 0:10]
+    X_features = ['AGE', 'COUNTRY', 'PLAYING ROLE', 'T-RUNS', 'T-WKTS', 'ODI-RUNS-S', 'ODI-SR-B', 'ODI-WKTS', 'ODI-SR-BL','CAPTAINCY EXP', 'RUNS-S', 'HS', 'AVE', 'SR-B','SIXERS', 'RUNS-C', 'WKTS', 'AVE-BL', 'ECON', 'SR-BL']
+    categorical_features = ['AGE', 'COUNTRY','PLAYING ROLE','CAPTAINCY EXP']
+    ipl_encoded_df = pd.get_dummies(ipl_df[X_features], columns=categorical_features, drop_first = True)
+    X_features = ipl_encoded_df.columns
+    print(X_features)
+    import statsmodels.api as sm
+    from sklearn.model_selection import train_test_split
+    X = sm.add_constant(ipl_encoded_df)
+    y = ipl_df['SOLD PRICE']
+    train_X, test_X, train_y, test_y = train_test_split(X,y,train_size = 0.8, random_state = 42)
+    #random_state is set to the seed 42 randomly. This is to reproduce the result across the runs. 
+    #Also it ensures same records go for training and validation
+    model1 = sm.OLS(train_y,train_X).fit()
+    model1.summary2()
+    from sklearn.metrics import r2_score, mean_squared_error
+    import numpy as np
+    pred_y = model1.predict(test_X)
+    print("The r2_score of the model is", np.abs(r2_score(test_y, pred_y)))
+    print("The RMSE of the trained model is", np.sqrt(mean_squared_error(test_y, pred_y)))
+    print("The model parameters are")
+    print(model1.params)
+    s = model1.pvalues
+    #print(s.index)
+    vars = list(s.index)  #s.index returns the variable names of the pandas series s. 
+    #print(vars)
+    pvals = list(s)
+    #print(pvals)
+    new = [i for i in zip(vars,pvals)] 
+    print("List of all variables and their pvalues is",new)
+    important_vars = [ i[0]  for i in new if i[1] < 0.05]
+    print("List of influencing variables is",important_vars)
+    train_X = train_X[important_vars]
+    model2 = sm.OLS(train_y, train_X).fit()
+    model2.summary2()
+    new_test_X = test_X[train_X.columns]
+    pred_y = model2.predict(new_test_X)
+    from sklearn.metrics import r2_score, mean_squared_error
+    import numpy as np
+    print("The r2_score of the model is", np.abs(r2_score(test_y, pred_y)))
+    print("The RMSE of the trained model is", np.sqrt(mean_squared_error(test_y, pred_y)))
+    print("The model parameters are")
+    print(model2.params)
+    import numpy as np
+    shapes = ["circle", "triangle", "cube", "rectangle", "line"]
+    
+    total_shapes = ["circle", "triangle", "cube", "rectangle", "line"]
+    
+    mapping = {}
+    for x in range(len(total_shapes)):
+      mapping[total_shapes[x]] = x
+    
+    one_hot_encode = []
+    
+    for c in shapes:
+      arr = list(np.zeros(len(total_shapes), dtype = int))
+      arr[mapping[c]] = 1
+      one_hot_encode.append(arr)
+    
+    print(one_hot_encode)
+    # [[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 1, 0], [0, 0, 0, 0, 1]]
+    import numpy as np
+    shapes = ["mango", "apple", "orange", "banana", "pear", "avacado"]
+    
+    total_shapes = ["mango", "apple", "orange", "banana", "pear", "avacado"]
+    
+    mapping = {}
+    for x in range(len(total_shapes)):
+      mapping[total_shapes[x]] = x
+    
+    one_hot_encode = []
+    
+    for c in shapes:
+      arr = list(np.zeros(len(total_shapes), dtype = int))
+      arr[mapping[c]] = 1
+      one_hot_encode.append(arr)
+    
+    print(one_hot_encode)
+    import pandas as pd
+    data=pd.DataFrame({'Shape':["circle", "triangle", "cube", "rectangle", "line"]})
+    
+    data_encoded=pd.get_dummies(data=data,drop_first=True)
+    data_encoded
+  </code></pre></div>  
+  
+  <div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">Decision Tree Classifier GINI-6</div><code>
+    from google.colab import files
+uploaded = files.upload()
+import pandas as pd
+df = pd.read_csv("/content/German Credit Data.csv")
+df.info()
+df.shape
+df.head()
+df.iloc[0:5,0:7]
+df.iloc[0:5, 7:15]
+df['checkin_acc'].unique()
+X_features = list(df.columns)
+X_features.remove('status')
+encoded_df = pd.get_dummies(df[X_features],drop_first=True)
+print(list(encoded_df.columns))
+X = encoded_df
+Y = df['status']
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X,Y,test_size = 0.3, random_state = 42)
+from sklearn.tree import DecisionTreeClassifier
+clf = DecisionTreeClassifier(criterion = 'gini', max_depth = 3)
+clf.fit(X_train, y_train)
+pred_y = clf.predict(X_test)
+from sklearn import metrics
+print("Confusion Matrix is\n",metrics.confusion_matrix(pred_y, y_test))
+print("Accuracy is", metrics.accuracy_score(pred_y,y_test))
+print("AUC Score is", metrics.roc_auc_score(pred_y, y_test))
+from sklearn.tree import export_graphviz
+import pydotplus as pdot
+from IPython.display import Image
+export_graphviz(clf,out_file = "tree.odt", feature_names = X_train.columns, filled = True)
+graph = pdot.graphviz.graph_from_dot_file("tree.odt")
+graph.write_jpg("tree.png")
+Image(filename = "tree.png")
+  </code></pre></div>
+
+
+  <div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">KNN - Grid Search (Heart)-7</div><code>
+    from google.colab import files
+    uploaded = files.upload()
+    import pandas as pd
+    import seaborn as sns
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.metrics import classification_report
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import roc_auc_score
+    from sklearn.model_selection import GridSearchCV 
+    df = pd.read_csv('/content/heart.csv')    
+    # print(df.info())
+    # print(df.shape)
+    print(df.head())
+    df.isnull().sum()
+    sns.countplot(df['target'])
+    x = df.drop(columns=['target'])
+    y = df['target']
+    knn = KNeighborsClassifier()
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=4)
+    #Training the model
+    knn.fit(x_train, y_train)
+    y_pred = knn.predict(x_test)
+    print(classification_report(y_test, y_pred))
+    roc_auc_score(y_test, y_pred)
+    leaf_size = list(range(1,15))
+    n_neighbors = list(range(1,10))
+    p=[1,2]   
+    hyperparameters = dict(leaf_size=leaf_size, n_neighbors=n_neighbors, p=p)
+    knn_2 = KNeighborsClassifier()
+    clf = GridSearchCV(knn_2, hyperparameters, cv=10, scoring = 'roc_auc')
+    best_model = clf.fit(x,y)
+    #Nilai hyperpaameters terbaik
+    print('Best leaf_size:', best_model.best_estimator_.get_params()['leaf_size'])
+    print('Best p:', best_model.best_estimator_.get_params()['p'])
+    print('Best n_neighbors:', best_model.best_estimator_.get_params()['n_neighbors'])
+    print('Best Score:', best_model.best_score_)
+    y_pred = best_model.predict(x_test)
+    print(classification_report(y_test, y_pred))
+    print("AUC SCORE is",roc_auc_score(y_test, y_pred))
+  </code></pre></div>  
+
+  <div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">Ensemble Learning (github)-8 </div><code>
+    Question 1 : Implement the Bagging based Ensemble Model using CART (Classification and Regression Trees) as base learners. No. of base learners = 100. Use cross validation as the model estimation method. 
+    import pandas 
+    from sklearn import model_selection
+    from sklearn.ensemble import BaggingClassifier
+    from sklearn.tree import DecisionTreeClassifier
+    url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+    names = ['preg', 'plas','pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+    df = pandas.read_csv(url, names=names)
+    df.shape
+    array = df.values
+    X = array[:, 0:8]
+    Y = array[:, 8]
+    Kfold = model_selection.KFold(n_splits=10, random_state=7)
+    cart = DecisionTreeClassifier()
+    num_trees = 100
+    model = BaggingClassifier(base_estimator=cart, n_estimators=num_trees,random_state=7)
+    results = model_selection.cross_val_score(model,X,Y, cv = Kfold)
+    average_accuracy = sum(results)/len(results)
+    print("Average Accuracy is ", average_accuracy)
+    
+    Question 2 : Implement the AdaBoost Ensemble model for classification using 10 base learners and cross validation.
+    import pandas 
+    from sklearn import model_selection
+    from sklearn.ensemble import AdaBoostClassifier
+    from sklearn.tree import DecisionTreeClassifier
+    url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+    names = ['preg', 'plas','pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+    df = pandas.read_csv(url, names=names)
+    df.shape
+    array = df.values
+    X = array[:, 0:8]
+    Y = array[:, 8]
+    Kfold = model_selection.KFold(n_splits=10, random_state=7)
+    num_trees = 10
+    model = AdaBoostClassifier(n_estimators=num_trees,random_state=7)
+    results = model_selection.cross_val_score(model,X,Y, cv = Kfold)
+    average_accuracy = sum(results)/len(results)
+    print("Average Accuracy is ", average_accuracy)
+    
+    Question 3: (Same as Question 1) Implement the Bagging based Ensemble Model using k-Nearest Neighbor Classifier as base learners. No. of base learners = 100. Use cross validation as the model estimation method.
+    import pandas 
+    from sklearn import model_selection
+    from sklearn.ensemble import BaggingClassifier
+    from sklearn.neighbors import KNeighborsClassifier
+    url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+    names = ['preg', 'plas','pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+    df = pandas.read_csv(url, names=names)
+    df.shape
+    array = df.values
+    X = array[:, 0:8]
+    Y = array[:, 8]
+    Kfold = model_selection.KFold(n_splits=10, random_state=7)
+    knn = KNeighborsClassifier()
+    num_learners = 100
+    model = BaggingClassifier(base_estimator=knn, n_estimators=num_learners,random_state=7)
+    results = model_selection.cross_val_score(model,X,Y, cv = Kfold)
+    average_accuracy = sum(results)/len(results)
+    print("Average Accuracy is ", average_accuracy)
+    
+  </code></pre></div>  
+
+
+  <div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">K Means Clustering (Income)-9</div><code>
+    from google.colab import files
+    uploaded = files.upload()
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sn
+    df = pd.read_csv("/content/Income Data.csv")
+    sn.lmplot("age", "income", data = df, fit_reg = False, size = 4)
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    scaled_df = scaler.fit_transform(df[["age", "income"]])
+    scaled_df[0:5]
+    from sklearn.cluster import KMeans
+    clusters = KMeans(3)
+    clusters.fit(scaled_df)
+    df["clusterid"] = clusters.labels_
+    markers = ['+', '^', '*']
+    sn.lmplot("age", "income", data = df, hue = "clusterid", fit_reg = False, markers  = markers, size = 4)
+    clusters = KMeans(3)
+    clusters.fit(df)
+    df["new_clusterid"] = clusters.labels_
+    df.groupby("new_clusterid")['age', 'income'].agg(["mean", 'std']).reset_index()
+    cluster_range = range(1,10)
+    cluster_errors = []
+    for num_clusters in cluster_range:
+      clusters = KMeans(num_clusters)
+      clusters.fit(scaled_df)
+      cluster_errors.append(clusters.inertia_)
+    plt.figure(figsize = (6,4))
+    plt.plot(cluster_range, cluster_errors, marker = "*")
+    plt.xlabel("No. of clusters")
+    plt.ylabel("Sum of Squared Error")  
+  </code></pre></div>  
+
+  <div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">Collaborative Filtering Movie-10</div><code>
+    from google.colab import files
+uploaded = files.upload()
+import pandas as pd
+df = pd.read_csv("/content/rating.csv")
+df.head(5)
+df.drop('timestamp', axis = 1, inplace = True) 
+print("No. of unique users =",len(df['userId'].unique()))
+print("No. of unique movies =",len(df['movieId'].unique()))
+user_movies_df = df.pivot(index = "userId", columns = "movieId", values = "rating").reset_index(drop = True)
+user_movies_df.index = df.userId.unique()
+user_movies_df.fillna(0, inplace = True)
+from sklearn.metrics import pairwise_distances
+from scipy.spatial.distance import cosine, correlation
+user_sim = 1 - pairwise_distances(user_movies_df.values, metric = "cosine") 
+#covert this matrix to a frame
+user_sim_df = pd.DataFrame(user_sim)
+#set the index and column names to user ids 
+user_sim_df.index = df.userId.unique()
+user_sim_df.columns = df.userId.unique()
+user_sim_df.iloc[0:5, 0:5]
+import numpy as np
+np.fill_diagonal(user_sim, 0)
+user_sim_df.iloc[0:5, 0:5]
+user_sim_df.idxmax(axis=1)[0:5]
+
+#RECOMMENDATION SYSTEM
+uploaded = files.upload()
+movies_df = pd.read_csv("/content/movie.csv")
+movies_df.drop('genres', axis = 1, inplace = True)
+movies_df.iloc[0:5, 0:5]
+def get_user_similar_movies(user1, user2):
+  #Inner join of movies watched by both users will give the common movies
+  common = df[df.userId == user1].merge(df[df.userId == user2], on = "movieId", how = "inner")
+  #merge this result with movie details
+  return common.merge(movies_df, on = "movieId")
+common_movies = get_user_similar_movies(1,2595 )
+#print(common_movies)
+common_movies[(common_movies.rating_x >=4.0) & ((common_movies.rating_y >=4.0))]
+  </code></pre></div>  
+  <div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">ALL</div><code>
+    SLR
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    from google.colab import files
+    .
+    uploaded = files.upload()
+    .
+    df = pd.read_csv('path')
+    .
+    df.head()
+    df.info()
+    print(df.describe())
+    print(df.shape)
+    .
+    X = df['column 1 name']
+    y = df['column 2 name']
+    .
+    plt.scatter(X, y, color = 'blue', label='Scatter Plot')
+    plt.title('Relationship between xlabel andn y label')
+    plt.xlabel('xlabelhere')
+    plt.ylabel('ylabelname')
+    plt.legend(loc=4)
+    plt.show()
+    .
+    print(X.shape)
+    print(y.shape)
+    .
+    X=np.array(X)
+    y=np.array(y)
+    X
+    Y
+    .
+    X = X.reshape(-1,1)
+    y = y.reshape(-1,1)
+    print(X.shape)
+    print(y.shape)
+    .
+    from sklearn.model_selection import train_test_split
+    X_train,X_test,y_train,y_test = train_test_split(X, y, test_size=0.30, random_state=42)
+    print(X_train.shape)
+    print(y_train.shape)
+    print(X_test.shape)
+    print(y_test.shape)
+    .
+    from sklearn.linear_model import LinearRegression
+    lm = LinearRegression()
+    # Training the model
+    lm.fit(X_train,y_train)
+    # Predicting on the test data
+    y_pred=lm.predict(X_test)
+    .
+    plt.scatter(X_train, y_train, color = 'red')
+    plt.plot(X_train, lm.predict(X_train), color = 'blue')
+    plt.scatter(X_test, y_test, color = 'red')
+    plt.plot(X_test, lm.predict(X_test), color = 'blue')
+    plt.title('Test results')
+    plt.xlabel('xlabel name')
+    plt.ylabel('ylabel name')
+    plt.show()
+    .
+    slope = lm.coef_
+    intercept = lm.intercept_,
+    print("Estimated model slope:" , slope)
+    print("Estimated model intercept:" , intercept)
+    .
+    X_new = [[80]]
+    lm.predict(X_new)
+    .
+    from sklearn.metrics import r2_score, mean_squared_error
+    pred_y = lm.predict(X_test)
+    print('R2 Score =',np.abs(r2_score(y_test,pred_y)))
+    print('RMSE = ', np.sqrt(mean_squared_error(y_test,pred_y)))
+    
+    MLR
+    
+    import pandas as pd
+    ipl_df = pd.read_csv("/content/IPL IMB381IPL2013.csv")  
+    print(ipl_df.info())
+    print(ipl_df.shape)
+    print(ipl_df.head())
+    ipl_df.iloc[0:5, 0:10]
+    X_features = ['AGE', 'COUNTRY', 'PLAYING ROLE', 'T-RUNS', 'T-WKTS', 'ODI-RUNS-S', 'ODI-SR-B', 'ODI-WKTS', 'ODI-SR-BL','CAPTAINCY EXP', 'RUNS-S', 'HS', 'AVE', 'SR-B','SIXERS', 'RUNS-C', 'WKTS', 'AVE-BL', 'ECON', 'SR-BL']
+    categorical_features = ['AGE', 'COUNTRY','PLAYING ROLE','CAPTAINCY EXP']
+    ipl_encoded_df = pd.get_dummies(ipl_df[X_features], columns=categorical_features, drop_first = True)
+    X_features = ipl_encoded_df.columns
+    print(X_features)
+    import statsmodels.api as sm
+    from sklearn.model_selection import train_test_split
+    X = sm.add_constant(ipl_encoded_df)
+    y = ipl_df['SOLD PRICE']
+    train_X, test_X, train_y, test_y = train_test_split(X,y,train_size = 0.8, random_state = 42)
+    #random_state is set to the seed 42 randomly. This is to reproduce the result across the runs. 
+    #Also it ensures same records go for training and validation
+    model1 = sm.OLS(train_y,train_X).fit()
+    model1.summary2()
+    from sklearn.metrics import r2_score, mean_squared_error
+    import numpy as np
+    pred_y = model1.predict(test_X)
+    print("The r2_score of the model is", np.abs(r2_score(test_y, pred_y)))
+    print("The RMSE of the trained model is", np.sqrt(mean_squared_error(test_y, pred_y)))
+    print("The model parameters are")
+    print(model1.params)
+    s = model1.pvalues
+    #print(s.index)
+    vars = list(s.index)  #s.index returns the variable names of the pandas series s. 
+    #print(vars)
+    pvals = list(s)
+    #print(pvals)
+    new = [i for i in zip(vars,pvals)] 
+    print("List of all variables and their pvalues is",new)
+    important_vars = [ i[0]  for i in new if i[1] < 0.05]
+    print("List of influencing variables is",important_vars)
+    train_X = train_X[important_vars]
+    model2 = sm.OLS(train_y, train_X).fit()
+    model2.summary2()
+    new_test_X = test_X[train_X.columns]
+    pred_y = model2.predict(new_test_X)
+    from sklearn.metrics import r2_score, mean_squared_error
+    import numpy as np
+    print("The r2_score of the model is", np.abs(r2_score(test_y, pred_y)))
+    print("The RMSE of the trained model is", np.sqrt(mean_squared_error(test_y, pred_y)))
+    print("The model parameters are")
+    print(model2.params)
+    import numpy as np
+    shapes = ["circle", "triangle", "cube", "rectangle", "line"]
+    
+    total_shapes = ["circle", "triangle", "cube", "rectangle", "line"]
+    
+    mapping = {}
+    for x in range(len(total_shapes)):
+        mapping[total_shapes[x]] = x
+    
+    one_hot_encode = []
+    
+    for c in shapes:
+        arr = list(np.zeros(len(total_shapes), dtype = int))
+        arr[mapping[c]] = 1
+        one_hot_encode.append(arr)
+    
+    print(one_hot_encode)
+    # [[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 1, 0], [0, 0, 0, 0, 1]]
+    import numpy as np
+    shapes = ["mango", "apple", "orange", "banana", "pear", "avacado"]
+    
+    total_shapes = ["mango", "apple", "orange", "banana", "pear", "avacado"]
+    
+    mapping = {}
+    for x in range(len(total_shapes)):
+        mapping[total_shapes[x]] = x
+    
+    one_hot_encode = []
+    
+    for c in shapes:
+        arr = list(np.zeros(len(total_shapes), dtype = int))
+        arr[mapping[c]] = 1
+        one_hot_encode.append(arr)
+    
+    print(one_hot_encode)
+    import pandas as pd
+    data=pd.DataFrame({'Shape':["circle", "triangle", "cube", "rectangle", "line"]})
+    
+    data_encoded=pd.get_dummies(data=data,drop_first=True)
+    data_encoded
+    
+    DECISION TREE_GINI index
+    
+        from google.colab import files
+    uploaded = files.upload()
+    import pandas as pd
+    df = pd.read_csv("/content/German Credit Data.csv")
+    df.info()
+    df.shape
+    df.head()
+    df.iloc[0:5,0:7]
+    df.iloc[0:5, 7:15]
+    df['checkin_acc'].unique()
+    X_features = list(df.columns)
+    X_features.remove('status')
+    encoded_df = pd.get_dummies(df[X_features],drop_first=True)
+    print(list(encoded_df.columns))
+    X = encoded_df
+    Y = df['status']
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X,Y,test_size = 0.3, random_state = 42)
+    from sklearn.tree import DecisionTreeClassifier
+    clf = DecisionTreeClassifier(criterion = 'gini', max_depth = 3)
+    clf.fit(X_train, y_train)
+    pred_y = clf.predict(X_test)
+    from sklearn import metrics
+    print("Confusion Matrix is\n",metrics.confusion_matrix(pred_y, y_test))
+    print("Accuracy is", metrics.accuracy_score(pred_y,y_test))
+    print("AUC Score is", metrics.roc_auc_score(pred_y, y_test))
+    from sklearn.tree import export_graphviz
+    import pydotplus as pdot
+    from IPython.display import Image
+    export_graphviz(clf,out_file = "tree.odt", feature_names = X_train.columns, filled = True)
+    graph = pdot.graphviz.graph_from_dot_file("tree.odt")
+    graph.write_jpg("tree.png")
+    Image(filename = "tree.png")
+      
+    KNN GRID 
+    
+    from google.colab import files
+    uploaded = files.upload()
+    import pandas as pd
+    import seaborn as sns
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.metrics import classification_report
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import roc_auc_score
+    from sklearn.model_selection import GridSearchCV 
+    df = pd.read_csv('/content/heart.csv')    
+    # print(df.info())
+    # print(df.shape)
+    print(df.head())
+    df.isnull().sum()
+    sns.countplot(df['target'])
+    x = df.drop(columns=['target'])
+    y = df['target']
+    knn = KNeighborsClassifier()
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=4)
+    #Training the model
+    knn.fit(x_train, y_train)
+    y_pred = knn.predict(x_test)
+    print(classification_report(y_test, y_pred))
+    roc_auc_score(y_test, y_pred)
+    leaf_size = list(range(1,15))
+    n_neighbors = list(range(1,10))
+    p=[1,2]   
+    hyperparameters = dict(leaf_size=leaf_size, n_neighbors=n_neighbors, p=p)
+    knn_2 = KNeighborsClassifier()
+    clf = GridSearchCV(knn_2, hyperparameters, cv=10, scoring = 'roc_auc')
+    best_model = clf.fit(x,y)
+    #Nilai hyperpaameters terbaik
+    print('Best leaf_size:', best_model.best_estimator_.get_params()['leaf_size'])
+    print('Best p:', best_model.best_estimator_.get_params()['p'])
+    print('Best n_neighbors:', best_model.best_estimator_.get_params()['n_neighbors'])
+    print('Best Score:', best_model.best_score_)
+    y_pred = best_model.predict(x_test)
+    print(classification_report(y_test, y_pred))
+    print("AUC SCORE is",roc_auc_score(y_test, y_pred))
+    
+    ENSEMBLE LEARNING
+    Question 1 : Implement the Bagging based Ensemble Model using CART (Classification and Regression Trees) as base learners. No. of base learners = 100. Use cross validation as the model estimation method. 
+    import pandas 
+    from sklearn import model_selection
+    from sklearn.ensemble import BaggingClassifier
+    from sklearn.tree import DecisionTreeClassifier
+    url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+    names = ['preg', 'plas','pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+    df = pandas.read_csv(url, names=names)
+    df.shape
+    array = df.values
+    X = array[:, 0:8]
+    Y = array[:, 8]
+    Kfold = model_selection.KFold(n_splits=10, random_state=7)
+    cart = DecisionTreeClassifier()
+    num_trees = 100
+    model = BaggingClassifier(base_estimator=cart, n_estimators=num_trees,random_state=7)
+    results = model_selection.cross_val_score(model,X,Y, cv = Kfold)
+    average_accuracy = sum(results)/len(results)
+    print("Average Accuracy is ", average_accuracy)
+    
+    Question 2 : Implement the AdaBoost Ensemble model for classification using 10 base learners and cross validation.
+    import pandas 
+    from sklearn import model_selection
+    from sklearn.ensemble import AdaBoostClassifier
+    from sklearn.tree import DecisionTreeClassifier
+    url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+    names = ['preg', 'plas','pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+    df = pandas.read_csv(url, names=names)
+    df.shape
+    array = df.values
+    X = array[:, 0:8]
+    Y = array[:, 8]
+    Kfold = model_selection.KFold(n_splits=10, random_state=7)
+    num_trees = 10
+    model = AdaBoostClassifier(n_estimators=num_trees,random_state=7)
+    results = model_selection.cross_val_score(model,X,Y, cv = Kfold)
+    average_accuracy = sum(results)/len(results)
+    print("Average Accuracy is ", average_accuracy)
+    
+    Question 3: (Same as Question 1) Implement the Bagging based Ensemble Model using k-Nearest Neighbor Classifier as base learners. No. of base learners = 100. Use cross validation as the model estimation method.
+    import pandas 
+    from sklearn import model_selection
+    from sklearn.ensemble import BaggingClassifier
+    from sklearn.neighbors import KNeighborsClassifier
+    url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+    names = ['preg', 'plas','pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+    df = pandas.read_csv(url, names=names)
+    df.shape
+    array = df.values
+    X = array[:, 0:8]
+    Y = array[:, 8]
+    Kfold = model_selection.KFold(n_splits=10, random_state=7)
+    knn = KNeighborsClassifier()
+    num_learners = 100
+    model = BaggingClassifier(base_estimator=knn, n_estimators=num_learners,random_state=7)
+    results = model_selection.cross_val_score(model,X,Y, cv = Kfold)
+    average_accuracy = sum(results)/len(results)
+    print("Average Accuracy is ", average_accuracy)
+    
+    K MEANS CLUSTERING
+    from google.colab import files
+    uploaded = files.upload()
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sn
+    df = pd.read_csv("/content/Income Data.csv")
+    sn.lmplot("age", "income", data = df, fit_reg = False, size = 4)
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    scaled_df = scaler.fit_transform(df[["age", "income"]])
+    scaled_df[0:5]
+    from sklearn.cluster import KMeans
+    clusters = KMeans(3)
+    clusters.fit(scaled_df)
+    df["clusterid"] = clusters.labels_
+    markers = ['+', '^', '*']
+    sn.lmplot("age", "income", data = df, hue = "clusterid", fit_reg = False, markers  = markers, size = 4)
+    clusters = KMeans(3)
+    clusters.fit(df)
+    df["new_clusterid"] = clusters.labels_
+    df.groupby("new_clusterid")['age', 'income'].agg(["mean", 'std']).reset_index()
+    cluster_range = range(1,10)
+    cluster_errors = []
+    for num_clusters in cluster_range:
+        clusters = KMeans(num_clusters)
+        clusters.fit(scaled_df)
+        cluster_errors.append(clusters.inertia_)
+    plt.figure(figsize = (6,4))
+    plt.plot(cluster_range, cluster_errors, marker = "*")
+    plt.xlabel("No. of clusters")
+    plt.ylabel("Sum of Squared Error")  
+    
+    Collaborative FIltering
+    
+        from google.colab import files
+    uploaded = files.upload()
+    import pandas as pd
+    df = pd.read_csv("/content/rating.csv")
+    df.head(5)
+    df.drop('timestamp', axis = 1, inplace = True) 
+    print("No. of unique users =",len(df['userId'].unique()))
+    print("No. of unique movies =",len(df['movieId'].unique()))
+    user_movies_df = df.pivot(index = "userId", columns = "movieId", values = "rating").reset_index(drop = True)
+    user_movies_df.index = df.userId.unique()
+    user_movies_df.fillna(0, inplace = True)
+    from sklearn.metrics import pairwise_distances
+    from scipy.spatial.distance import cosine, correlation
+    user_sim = 1 - pairwise_distances(user_movies_df.values, metric = "cosine") 
+    #covert this matrix to a frame
+    user_sim_df = pd.DataFrame(user_sim)
+    #set the index and column names to user ids 
+    user_sim_df.index = df.userId.unique()
+    user_sim_df.columns = df.userId.unique()
+    user_sim_df.iloc[0:5, 0:5]
+    import numpy as np
+    np.fill_diagonal(user_sim, 0)
+    user_sim_df.iloc[0:5, 0:5]
+    user_sim_df.idxmax(axis=1)[0:5]
+    
+    #RECOMMENDATION SYSTEM
+    uploaded = files.upload()
+    movies_df = pd.read_csv("/content/movie.csv")
+    movies_df.drop('genres', axis = 1, inplace = True)
+    movies_df.iloc[0:5, 0:5]
+    def get_user_similar_movies(user1, user2):
+      #Inner join of movies watched by both users will give the common movies
+      common = df[df.userId == user1].merge(df[df.userId == user2], on = "movieId", how = "inner")
+      #merge this result with movie details
+      return common.merge(movies_df, on = "movieId")
+    common_movies = get_user_similar_movies(1,2595 )
+    #print(common_movies)
+    common_movies[(common_movies.rating_x >=4.0) & ((common_movies.rating_y >=4.0))]</code></pre></div> -->
+
+<div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">Q5- Annual Income Gender</div><code>#upload 
+from google.colab import files
+uploaded = files.upload()
+
+#reading file 
+import pandas as pd
+import numpy as np 
+import seaborn as sn
+import matplotlib.pyplot as plt
+df = pd.read_csv("/content/q5.csv")
+df.head()
+
+#plotting graph
+sn.lmplot("Age ", "Annual Income(k$)", data = df, fit_reg = False, size = 4) 
+
+#elbow methods to find group and clusters
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+scaler = StandardScaler()
+scaled_df = scaler.fit_transform(df[["Age ", "Annual Income(k$)"]])
+scaled_df[0:5]
+clusters = KMeans(3)
+clusters.fit(scaled_df)
+df["clusterid"] = clusters.labels_
+cluster_range = range(1,10)
+cluster_errors = []
+for num in cluster_range:
+  clusters = KMeans(num)
+  clusters.fit(scaled_df)
+  cluster_errors.append(clusters.inertia_)
+plt.figure(figsize = (6,4))
+plt.plot(cluster_range, cluster_errors, marker = "+")
+plt.xlabel("clusters")
+plt.ylabel("Sum of Squared Error")
+
+#mean and standard deviation
+clusters = KMeans(3)
+clusters.fit(scaled_df)
+df["new_clusterid"] = clusters.labels_
+markers = ['+', '^', '*']
+df.groupby("new_clusterid")['Annual Income(k$)','Spending Score(1-100)'].agg(["mean", 'std']).reset_index()
+
+#plotting each cluster
+sn.lmplot("Age ", "Annual Income(k$)", data = df, hue = "new_clusterid", fit_reg = False, markers = markers, size = 4) 
+</code></pre></div>  
+
+<div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">Q6 - Weather || COMPANY Grade</div><code>#upload 
+from google.colab import files
+uploaded = files.upload()
+
+#reading file 
+import pandas as pd
+import numpy as np 
+import seaborn as sn
+import matplotlib.pyplot as plt
+df = pd.read_csv("/content/exam1.csv")
+df.head()
+
+#display column
+df.columns
+
+#encode data
+df['OUTLOOK'].unique()
+X_features = list(df.columns)
+X_features.remove('PLAY GOLF')
+encoded_df = pd.get_dummies(df[X_features],drop_first=True)
+print(list(encoded_df.columns))
+X = encoded_df
+Y = df['PLAY GOLF']
+
+#split and train data
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.tree import DecisionTreeClassifier
+X_train, X_test, y_train, y_test = train_test_split(X,Y,test_size = 0.3, random_state = 42)
+clf = DecisionTreeClassifier(criterion = 'gini', max_depth = 3)
+clf.fit(X_train, y_train)
+
+#confusion matrox and accuracy
+pred_y = clf.predict(X_test)
+print("Confusion Matrix is\n",metrics.confusion_matrix(pred_y, y_test))
+print("Accuracy is", metrics.accuracy_score(pred_y,y_test))</code></pre></div>  
+
+<div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">Q - Comedy Show</div><code>#upload 
+from google.colab import files
+uploaded = files.upload()
+
+import pandas
+from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier
+import matplotlib.pyplot as plt
+from sklearn import metrics
+from sklearn.model_selection import train_test_split
+
+#reading and description
+df = pandas.read_csv("data.csv")
+df.head
+df.describe
+
+# splitting data
+d = {'UK': 0, 'USA': 1, 'N': 2}
+df['Nationality'] = df['Nationality'].map(d)
+d = {'YES': 1, 'NO': 0}
+df['Go'] = df['Go'].map(d)
+
+# # encoding and assigning
+features = ['Age', 'Experience', 'Rank', 'Nationality']
+X = df[features]
+y = df['Go']
+
+
+# # Splitting the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
+dtree = DecisionTreeClassifier()
+dtree = dtree.fit(X_train, y_train)
+y_pred = dtree.predict(X_test)
+
+# # Acucracy an dconfusion matrix
+print("Confusion Matrix:", metrics.confusion_matrix(y_test, y_pred))
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))</code></pre></div>  
+
+<div class="grid-item"><pre class="language-c grid-item"><div class="titleVisible">Q - CGPA - PACKAGE</div><code>#upload 
+from google.colab import files
+uploaded = files.upload()
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sn
+df = pd.read_csv("/content/etq2.csv")  
+
+# plotting data
+sn.lmplot("CGPA", "PACKAGE", data = df, fit_reg = False, size = 4)
+
+# normalizing and displaying
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaled_df = scaler.fit_transform(df[["CGPA", "PACKAGE"]])
+scaled_df[0:5]
+
+# assigning cluster labels
+from sklearn.cluster import KMeans
+clusters = KMeans(3)
+clusters.fit(scaled_df)
+df["clusterid"] = clusters.labels_
+markers = ['+', '^', '*']
+sn.lmplot("CGPA", "PACKAGE", data = df, hue = "clusterid", fit_reg = False, markers  = markers, size = 4)
+
+# mean age and package
+clusters = KMeans(3)
+clusters.fit(df)
+df["new_clusterid"] = clusters.labels_
+df.groupby("new_clusterid")['CGPA', 'PACKAGE'].agg(["mean", 'std']).reset_index()
+
+# optimum number of clusters
+cluster_range = range(1,10)
+cluster_errors = []
+for num_clusters in cluster_range:
+  clusters = KMeans(num_clusters)
+  clusters.fit(scaled_df)
+  cluster_errors.append(clusters.inertia_)
+plt.figure(figsize = (6,4))
+plt.plot(cluster_range, cluster_errors, marker = "*")
+plt.xlabel("No. of clusters")
+plt.ylabel("Sum of Squared Error")</code></pre></div>  
+
+ 
+  <script>
+    // document.onkeydown = function (e) {
+    // if (event.keyCode == 123) {
+    //   return false;
+    // }
+    // if (e.ctrlKey && e.shiftKey && e.keyCode == "I".charCodeAt(0)) {
+    //   return false;
+    // }
+    // if (e.ctrlKey && e.shiftKey && e.keyCode == "C".charCodeAt(0)) {
+    //   return false;
+    // }
+    // if (e.ctrlKey && e.shiftKey && e.keyCode == "J".charCodeAt(0)) {
+    //   return false;
+    // }
+    // if (e.ctrlKey && e.keyCode == "U".charCodeAt(0)) {
+    //   return false;
+    // }
+// };
+document.addEventListener("contextmenu", (event) => event.preventDefault());
+
+  </script>
+</body>
+</html>
